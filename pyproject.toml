@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chess-push"
+version = "0.1.0"
+description = "中国象棋实时走子推演解说：读取 TCHESS 盘面，引擎推荐走法，结合 FEN 计算走子效果与目的（将军/对子/压马/进兵活马/补士固中等），并由本地 LLM 生成解说"
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml>=6.0",
+    "requests>=2.31",
+]
+
+[project.scripts]
+chess-push = "chesspush.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

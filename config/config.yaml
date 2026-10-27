@@ -1,0 +1,52 @@
+# ============================================================
+# 中国象棋 · 实时走子推演解说  —— 全局配置
+# ============================================================
+
+# --- 引擎数据源（TCHESS / Pikafish 对外服务） ---
+engine:
+  # 注意：请用 127.0.0.1 而非 localhost。localhost 在 Python 中会解析为 IPv6(::1)，
+  # 而服务只监听 IPv4，导致每次请求先超时约 2s 再回退，整体变慢。
+  base_url: "http://127.0.0.1:8787"
+  state_endpoint: "/api/state"
+  fen_endpoint: "/api/fen"
+  analysis_endpoint: "/api/analysis"
+  # 每个分析线中提取的主变（主变）取第 1 条；若主变不足，回退深度最大的线
+
+# --- LLM（qwen3.5-4b，vLLM / OpenAI 兼容） ---
+llm:
+  base_url: "http://127.0.0.1:8000/v1"
+  chat_endpoint: "/chat/completions"
+  model: ""            # 留空则启动时自动从 /v1/models 探测
+  temperature: 0.7
+  max_tokens: 256
+  timeout: 60
+  # 连接失败时的降级策略：
+  #   strict  -> 无 LLM 时直接报错退出
+  #   fallback-> 无 LLM 时用规则模板生成基础解说（推荐）
+  on_unavailable: "fallback"
+
+# --- 实时监听 ---
+listener:
+  enabled: true
+  poll_interval: 1.0     # 轮询 8787 的间隔（秒）
+  # 触发重推的条件（任一发生即重新推演并推送）：
+  #   fen 变化 = 实际走了棋；best 变化 = 引擎换了推荐着法
+  trigger_on_fen_change: true
+  trigger_on_best_change: true
+  # 盘面 FEN 相对上一次发生变化才触发推演；首帧启动时也推一次当前局面
+  emit_on_startup: true
+
+# --- 解说 ---
+narration:
+  # 解说视角固定为「我方」，由盘面 isReverse 决定：False=执红，True=执黑。
+  # 仅在轮到我方走棋时解说走法；轮到对手走棋时不输出。
+  side_view: "my_side"
+  step_text: "single"    # single=仅推当前最佳一步的目的与效果
+  min_score_gap: 50      # 引擎多线 score 差距小于该值视为并列
+
+# --- 推送 ---
+pushers:
+  console: true          # 打印到控制台
+  file: true             # 写入 logs/narration.jsonl + logs/narration.txt
+  file_json: "logs/narration.jsonl"
+  file_text: "logs/narration.txt"

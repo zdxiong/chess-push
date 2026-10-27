@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+
+# 运行产物
+logs/*.jsonl
+logs/*.txt
+
+# 测试缓存
+.pytest_cache/
+
+# IDE
+.idea/
+.vscode/
